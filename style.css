@@ -110,3 +110,32 @@ body {
   box-shadow: 0 0 15px 5px #FFD700;
 }
 
+/* Indicateur pour case déjà ouverte */
+.day.opened {
+  opacity: 0.9;
+  transform: none; /* annule l'effet hover scale si nécessaire */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.45), inset 0 -6px 20px rgba(0,0,0,0.06);
+  cursor: pointer; /* on laisse le pointeur pour pouvoir rouvrir la surprise */
+}
+
+/* Petit badge coin (check) pour marquer l'ouverture */
+.day.opened::after {
+  content: "✓";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(255,255,255,0.12);
+  color: #FFF8DC;
+  font-weight: bold;
+  font-size: 14px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+
+
