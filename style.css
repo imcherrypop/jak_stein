@@ -1,4 +1,218 @@
+/* ============================================================
+   JAK_STEIN — Roue des Perks — style.css
+   ============================================================ */
 
+:root {
+  --bg:         #060504;
+  --red:        #8b0000;
+  --red-bright: #c8202e;
+  --red-glow:   rgba(200, 32, 46, 0.65);
+  --gold:       #c8882a;
+  --text:       #ddd3c5;
+  --dim:        #6a5e53;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2rem;
+  padding: 2rem 1rem 3rem;
+  overflow-x: hidden;
+}
+
+/* ── Noise overlay ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.14;
+}
+
+/* ── Vignette ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.88) 100%);
+}
+
+/* ── Top blood bar ── */
+.blood-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 5px; z-index: 100;
+  background: linear-gradient(to right,
+    transparent 5%,
+    var(--red) 30%,
+    var(--red-bright) 50%,
+    var(--red) 70%,
+    transparent 95%
+  );
+  box-shadow: 0 0 18px rgba(200, 32, 46, 0.7), 0 0 50px rgba(139, 0, 0, 0.3);
+}
+
+/* ── Channel name ── */
+.channel {
+  position: relative; z-index: 1;
+  text-align: center;
+  line-height: 1;
+}
+
+.channel-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2.2rem, 7vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-shadow:
+    0 0 30px rgba(200, 32, 46, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+.channel-name .underscore {
+  color: var(--red-bright);
+}
+
+.channel-sub {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: clamp(0.55rem, 1.5vw, 0.72rem);
+  letter-spacing: 0.55em;
+  text-indent: 0.55em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* ── Wheel area ── */
+.wheel-wrap {
+  position: relative; z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+/* ── Pointer ── */
+.pointer {
+  font-size: 1.8rem;
+  color: var(--red-bright);
+  line-height: 1;
+  text-shadow: 0 0 14px var(--red-glow), 0 0 40px rgba(139, 0, 0, 0.5);
+  animation: blink 2.2s ease-in-out infinite;
+  margin-bottom: -0.5rem;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; text-shadow: 0 0 14px var(--red-glow); }
+  50%       { opacity: 0.7; text-shadow: 0 0 30px var(--red-glow), 0 0 70px rgba(139, 0, 0, 0.4); }
+}
+
+/* ── Canvas ── */
+#wheelCanvas {
+  display: block;
+  cursor: pointer;
+  border-radius: 50%;
+  width: min(580px, 90vw);
+  height: min(580px, 90vw);
+  box-shadow:
+    0 0 0 3px var(--red),
+    0 0 0 8px #0d0b0a,
+    0 0 60px rgba(139, 0, 0, 0.55),
+    0 0 130px rgba(139, 0, 0, 0.18);
+  transition: box-shadow 0.35s;
+}
+
+#wheelCanvas:hover {
+  box-shadow:
+    0 0 0 3px var(--red-bright),
+    0 0 0 8px #0d0b0a,
+    0 0 90px rgba(139, 0, 0, 0.75),
+    0 0 180px rgba(139, 0, 0, 0.3);
+}
+
+#wheelCanvas.spinning {
+  cursor: not-allowed;
+}
+
+/* ── Spin button ── */
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.65rem, 1.6vw, 0.8rem);
+  letter-spacing: 0.3em;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--red);
+  padding: 0.95rem 3rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.32s ease;
+  z-index: 0;
+}
+
+.btn span {
+  position: relative; z-index: 1;
+}
+
+.btn:hover::before  { transform: scaleX(1); }
+.btn:hover          { border-color: var(--red-bright); box-shadow: 0 0 20px rgba(139, 0, 0, 0.35); }
+.btn:disabled       { opacity: 0.2; cursor: not-allowed; }
+.btn:disabled::before { display: none; }
+
+/* ── Result ── */
+#result {
+  position: relative; z-index: 1;
+  text-align: center;
+  min-height: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.result-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.55em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+.result-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.1rem, 3.5vw, 2rem);
+  font-weight: 700;
+  color: var(--red-bright);
+  text-shadow:
+    0 0 20px var(--red-glow),
+    0 0 55px rgba(139, 0, 0, 0.35);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.result-name.show {
+  opacity: 1;
+  transform: scale(1);
+}
 
 
 
