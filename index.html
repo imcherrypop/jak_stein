@@ -6,193 +6,12 @@
   <title>Jak_Stein — Roue des Perks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:         #060504;
-      --red:        #8b0000;
-      --red-bright: #c8202e;
-      --red-glow:   rgba(200, 32, 46, 0.65);
-      --gold:       #c8882a;
-      --text:       #ddd3c5;
-      --dim:        #6a5e53;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Cinzel', serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2.2rem;
-      padding: 2rem 1rem 3rem;
-      overflow-x: hidden;
-    }
-
-    /* ── Noise overlay ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.14;
-    }
-    body::after {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.88) 100%);
-    }
-
-    /* ── Top blood bar ── */
-    .blood-bar {
-      position: fixed; top: 0; left: 0; right: 0; height: 5px; z-index: 100;
-      background: linear-gradient(to right, transparent 5%, var(--red) 30%, var(--red-bright) 50%, var(--red) 70%, transparent 95%);
-      box-shadow: 0 0 18px rgba(200,32,46,0.7), 0 0 50px rgba(139,0,0,0.3);
-    }
-
-    /* ── Channel name ── */
-    .channel {
-      position: relative; z-index: 1;
-      text-align: center;
-      line-height: 1;
-    }
-    .channel-name {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(2.2rem, 7vw, 5.5rem);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--text);
-      text-shadow:
-        0 0 30px rgba(200,32,46,0.2),
-        0 2px 6px rgba(0,0,0,0.9);
-    }
-    .channel-name .underscore { color: var(--red-bright); }
-    .channel-sub {
-      display: block;
-      margin-top: 0.55rem;
-      font-size: clamp(0.55rem, 1.5vw, 0.72rem);
-      letter-spacing: 0.55em;
-      text-indent: 0.55em;
-      color: var(--dim);
-      text-transform: uppercase;
-    }
-
-    /* ── Wheel area ── */
-    .wheel-wrap {
-      position: relative; z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.6rem;
-    }
-
-    .pointer {
-      font-size: 1.8rem;
-      color: var(--red-bright);
-      line-height: 1;
-      text-shadow: 0 0 14px var(--red-glow), 0 0 40px rgba(139,0,0,0.5);
-      animation: blink 2.2s ease-in-out infinite;
-      margin-bottom: -0.5rem;
-    }
-    @keyframes blink {
-      0%,100% { opacity: 1; text-shadow: 0 0 14px var(--red-glow); }
-      50%      { opacity: 0.7; text-shadow: 0 0 30px var(--red-glow), 0 0 70px rgba(139,0,0,0.4); }
-    }
-
-    #wheelCanvas {
-      display: block;
-      cursor: pointer;
-      border-radius: 50%;
-      width: min(580px, 90vw);
-      height: min(580px, 90vw);
-      box-shadow:
-        0 0 0 3px var(--red),
-        0 0 0 8px #0d0b0a,
-        0 0 60px rgba(139,0,0,0.55),
-        0 0 130px rgba(139,0,0,0.18);
-      transition: box-shadow 0.35s;
-    }
-    #wheelCanvas:hover {
-      box-shadow:
-        0 0 0 3px var(--red-bright),
-        0 0 0 8px #0d0b0a,
-        0 0 90px rgba(139,0,0,0.75),
-        0 0 180px rgba(139,0,0,0.3);
-    }
-    #wheelCanvas.spinning { cursor: not-allowed; }
-
-    /* ── Spin button ── */
-    .btn {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(0.65rem, 1.6vw, 0.8rem);
-      letter-spacing: 0.3em;
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--red);
-      padding: 0.95rem 3rem;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .btn::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--red);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.32s ease;
-      z-index: 0;
-    }
-    .btn span { position: relative; z-index: 1; }
-    .btn:hover::before { transform: scaleX(1); }
-    .btn:hover { border-color: var(--red-bright); box-shadow: 0 0 20px rgba(139,0,0,0.35); }
-    .btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    .btn:disabled::before { display: none; }
-
-    /* ── Result ── */
-    #result {
-      position: relative; z-index: 1;
-      text-align: center;
-      min-height: 5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    .result-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.55em;
-      color: var(--dim);
-      text-transform: uppercase;
-    }
-    .result-name {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(1.1rem, 3.5vw, 2rem);
-      font-weight: 700;
-      color: var(--red-bright);
-      text-shadow:
-        0 0 20px var(--red-glow),
-        0 0 55px rgba(139,0,0,0.35);
-      opacity: 0;
-      transform: scale(0.85);
-      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .result-name.show {
-      opacity: 1;
-      transform: scale(1);
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <div class="blood-bar" aria-hidden="true"></div>
 
-  <!-- Channel name -->
   <header class="channel">
     <h1 class="channel-name">Jak<span class="underscore">_</span>Stein</h1>
     <span class="channel-sub">Roue des Perks · Dead by Daylight</span>
@@ -201,211 +20,35 @@
   <!-- Wheel -->
   <div class="wheel-wrap">
     <div class="pointer" aria-hidden="true">▼</div>
-    <canvas id="wheelCanvas" width="580" height="580"
+    <canvas id="wheelCanvas" width="600" height="600"
             role="button" tabindex="0"
-            aria-label="Cliquer pour lancer la roue des perks"></canvas>
+            aria-label="Cliquer pour lancer la roue"></canvas>
     <button class="btn" id="spinBtn"><span>⚰ &nbsp;Lancer la Roue&nbsp; ⚰</span></button>
   </div>
 
   <!-- Result -->
   <div id="result" aria-live="polite">
-    <span class="result-label" id="resultLabel" hidden>— Perk Révélée —</span>
-    <span class="result-name" id="resultName"></span>
+    <span class="result-label" id="resultLabel" hidden>— Résultat —</span>
+    <div class="res-entry-wrap" id="resEntryWrap">
+      <span id="resultBadge" class="result-badge"></span>
+      <span id="resultEntry" class="result-entry-name"></span>
+    </div>
+    <div class="result-arrow">↓</div>
+    <span id="resultPerk" class="result-perk"></span>
   </div>
 
-<script>
-const PERKS = [
-  // ── Générales Tueur ──
-  "Boucher Sadique", "Sanctuaire Monstrueux", "Espions de l'Ombre",
-  "Espoir Brisé", "Implacable", "Inquiétant", "Insidieux",
-  "Murmure Amer", "Murmures", "Pisteur", "Poigne de Fer",
-  "Sort : Euphorie de la Chasse", "Sort : Personne n'Échappe à la Mort",
-  // ── Le Piégeur ──
-  "Agitation", "Rancœur",
-  // ── L'Infirmière ──
-  "L'Appel de l'Infirmière", "Stridor",
-  // ── Le Montagnard ──
-  "Endurci", "Bricoleur", "Aveuglement",
-  // ── La Forme (Myers) ──
-  "Garder le Meilleur pour la Fin", "Jouer avec sa Nourriture", "Lumière Mourante",
-  // ── La Sorcière ──
-  "Sort : Le Troisième Sceau", "Sort : La Ruine",
-  // ── Le Docteur ──
-  "Présence Écrasante", "Contrôle & Abus", "Coulrophobie",
-  // ── La Chasseuse ──
-  "Bête de Proie", "Impératif Territorial", "Sort : Berceuse de la Chasseuse",
-  // ── Le Cannibale ──
-  "La Démence de Franklin", "Mise à Terre",
-  // ── Le Cauchemar (Freddy) ──
-  "Thanatophobie", "Souviens-toi de Moi", "En Feu",
-  // ── La Cochon ──
-  "Surveillance", "Choix Cornélien", "Tour du Bourreau",
-  // ── Le Clown ──
-  "Bamboozle", "Pop Goes the Weasel", "Ivre de Pouvoir",
-  // ── L'Esprit ──
-  "Sort : Rancune Tenace", "Changement de Cible", "Fureur Phénoménale",
-  // ── La Légion ──
-  "Discorde", "Toile de Sang", "Mise en Scène",
-  // ── La Peste ──
-  "Sort : Purge Funeste", "Corruption Totale", "Bénédiction Torturée",
-  // ── Le Spectre ──
-  "Soif de Sang", "Frappe Sournoise", "Naissance des Ombres",
-  // ── Le Demogorgon ──
-  "Démonstration de Force", "Envahissant", "Courir dans l'Obscurité",
-  // ── Oni ──
-  "Flux Démoniaque", "Furie Héréditaire", "Traque Implacable",
-  // ── Ghost Face ──
-  "Jeu Mortel", "Regard Meurtrier",
-];
+  <!-- Panel toggle -->
+  <div class="panel-toggle-row">
+    <button id="togglePanel" class="toggle-btn">▼ Gérer les tueurs</button>
+    <span class="filter-count" id="activeCount"></span>
+  </div>
 
-const canvas   = document.getElementById('wheelCanvas');
-const ctx      = canvas.getContext('2d');
-const spinBtn  = document.getElementById('spinBtn');
-const resName  = document.getElementById('resultName');
-const resLabel = document.getElementById('resultLabel');
+  <!-- Checklist panel -->
+  <div id="panelWrap" class="panel-wrap">
+    <div id="checkPanel" class="check-panel"></div>
+  </div>
 
-const NUM   = PERKS.length;
-const SLICE = (2 * Math.PI) / NUM;
-
-// Palette alternée : dark blood / near-black / dark rust / dark slate
-const PAL = [
-  ['#1c0505','#0a0202'],
-  ['#0e0e0e','#060606'],
-  ['#180a02','#090402'],
-  ['#0b0b15','#050510'],
-];
-
-let angle   = Math.random() * 2 * Math.PI;
-let running = false;
-
-function draw() {
-  const S  = canvas.width;
-  const CX = S / 2, CY = S / 2;
-  const R  = CX - 12;
-  const IR = 44;
-  ctx.clearRect(0, 0, S, S);
-
-  for (let i = 0; i < NUM; i++) {
-    const a0  = angle + i * SLICE;
-    const a1  = a0 + SLICE;
-    const mid = a0 + SLICE / 2;
-    const [c0, c1] = PAL[i % PAL.length];
-
-    const gx1 = CX + Math.cos(mid) * IR, gy1 = CY + Math.sin(mid) * IR;
-    const gx2 = CX + Math.cos(mid) * R,  gy2 = CY + Math.sin(mid) * R;
-    const g = ctx.createLinearGradient(gx1, gy1, gx2, gy2);
-    g.addColorStop(0, c0);
-    g.addColorStop(1, c1);
-
-    ctx.beginPath();
-    ctx.moveTo(CX, CY);
-    ctx.arc(CX, CY, R, a0, a1);
-    ctx.closePath();
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.strokeStyle = i % 2 ? '#2a0808' : '#1a1a1a';
-    ctx.lineWidth = 0.7;
-    ctx.stroke();
-
-    // Text
-    ctx.save();
-    ctx.translate(CX, CY);
-    ctx.rotate(mid);
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    const fs = Math.max(6.5, Math.min(9.5, 160 / NUM + 1));
-    ctx.font = `${fs}px Cinzel, serif`;
-    ctx.fillStyle = 'rgba(220,208,195,0.9)';
-    ctx.shadowColor = 'rgba(0,0,0,0.95)';
-    ctx.shadowBlur = 4;
-    ctx.fillText(PERKS[i], R - 14, 0, R - IR - 8);
-    ctx.restore();
-  }
-
-  // Outer ring
-  ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2);
-  ctx.strokeStyle = '#8b0000'; ctx.lineWidth = 3;
-  ctx.shadowColor = 'rgba(139,0,0,0.6)'; ctx.shadowBlur = 12; ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  ctx.beginPath(); ctx.arc(CX, CY, R - 7, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(139,0,0,0.18)'; ctx.lineWidth = 1; ctx.stroke();
-
-  // Tick marks
-  for (let i = 0; i < NUM; i++) {
-    const a = angle + i * SLICE;
-    ctx.save(); ctx.translate(CX, CY); ctx.rotate(a);
-    ctx.beginPath(); ctx.moveTo(R, 0); ctx.lineTo(R - 9, 0);
-    ctx.strokeStyle = 'rgba(139,0,0,0.4)'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.restore();
-  }
-
-  // Centre circle
-  const cg = ctx.createRadialGradient(CX, CY, 0, CX, CY, IR);
-  cg.addColorStop(0, '#3d0b0b'); cg.addColorStop(1, '#0a0404');
-  ctx.beginPath(); ctx.arc(CX, CY, IR, 0, Math.PI * 2);
-  ctx.fillStyle = cg; ctx.fill();
-  ctx.strokeStyle = '#8b0000'; ctx.lineWidth = 2;
-  ctx.shadowColor = 'rgba(200,32,46,0.5)'; ctx.shadowBlur = 8; ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // Skull
-  ctx.font = '26px serif';
-  ctx.fillStyle = '#cc2233'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(200,32,46,0.7)'; ctx.shadowBlur = 10;
-  ctx.fillText('☠', CX, CY);
-  ctx.shadowBlur = 0;
-}
-
-function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
-
-function spin() {
-  if (running) return;
-  running = true;
-  spinBtn.disabled = true;
-  canvas.classList.add('spinning');
-
-  // Reset result
-  resName.classList.remove('show');
-  resLabel.hidden = true;
-
-  const winner      = Math.floor(Math.random() * NUM);
-  const start       = angle;
-  const target      = -Math.PI / 2 - winner * SLICE - SLICE / 2;
-  let   delta       = (target - start) % (2 * Math.PI);
-  if (delta < 0) delta += 2 * Math.PI;
-  const total       = delta + (7 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
-  const duration    = 5500 + Math.random() * 2000;
-  let   startTime   = null;
-
-  function frame(ts) {
-    if (!startTime) startTime = ts;
-    const t = Math.min((ts - startTime) / duration, 1);
-    angle = start + total * easeOut(t);
-    draw();
-    if (t < 1) { requestAnimationFrame(frame); return; }
-
-    angle = ((start + total) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    draw();
-    running = false;
-    spinBtn.disabled = false;
-    canvas.classList.remove('spinning');
-
-    setTimeout(() => {
-      resName.textContent = PERKS[winner];
-      resLabel.hidden = false;
-      requestAnimationFrame(() => resName.classList.add('show'));
-    }, 300);
-  }
-  requestAnimationFrame(frame);
-}
-
-canvas.addEventListener('click', spin);
-spinBtn.addEventListener('click', spin);
-canvas.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') spin(); });
-
-draw();
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
 
